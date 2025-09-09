@@ -1,7 +1,13 @@
-// lib/register.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+// Warna konsisten dengan dashboard
+const Color primaryNavy = Color(0xFF223A5E);
+const Color accentBlue = Color(0xFF4A90E2);
+const Color softBlue = Color(0xFFE3F2FD);
+const Color softGrey = Color(0xFFF5F7FA);
+const Color accentYellow = Color(0xFFFFE082);
 
 class RegisterFlowPage extends StatefulWidget {
   const RegisterFlowPage({super.key});
@@ -16,10 +22,11 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
   final _step2Key = GlobalKey<FormState>();
 
   // API
-  static const String baseUrl = "http://10.18.118.179/psb-api"; // TODO: ganti
+  static const String baseUrl = "http://192.168.0.213/psb-api";
   Uri get insertUrl => Uri.parse("$baseUrl/insertregister.php");
   Uri get updateOrtuUrl => Uri.parse("$baseUrl/update_orangtua.php");
   Uri get cekUrl => Uri.parse("$baseUrl/cek_pendaftaran.php");
+
   // Step 1 controllers
   final nisC = TextEditingController();
   final namaC = TextEditingController();
@@ -27,7 +34,7 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
   final alamatC = TextEditingController();
   final emailC = TextEditingController();
   final asalSekolahC = TextEditingController();
-  String? gender; // 'Laki-Laki' | 'Perempuan'
+  String? gender;
   int? day, month, year;
 
   // Step 2 controllers
@@ -36,7 +43,7 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
 
   bool loading1 = false;
   bool loading2 = false;
-  int? siswaId; // dari insert step 1
+  int? siswaId;
 
   @override
   void dispose() {
@@ -72,7 +79,7 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
         insertUrl,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "nisn": nisC.text.trim(), // <= ubah dari nis ke nisn
+          "nisn": nisC.text.trim(),
           "nama_siswa": namaC.text.trim(),
           "nomor_telepon": telpC.text.trim(),
           "alamat": alamatC.text.trim(),
@@ -86,7 +93,6 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
       final data = jsonDecode(resp.body);
       if (resp.statusCode == 200 && data['success'] == true) {
         siswaId = data['id'];
-        // animasi geser ke kanan (next page)
         await page.animateToPage(
           1,
           duration: const Duration(milliseconds: 420),
@@ -124,7 +130,7 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
       if (resp.statusCode == 200 && data['success'] == true) {
         snack('Pendaftaran berhasil dikirim');
         if (!mounted) return;
-        Navigator.pop(context); // atau ke dashboard
+        Navigator.pop(context);
       } else {
         snack(data['message'] ?? 'Gagal menyimpan Data Orang Tua');
       }
@@ -137,14 +143,12 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
 
   @override
   Widget build(BuildContext context) {
-    final blue = const Color(0xFF1D3C5C);
-
     return Scaffold(
+      backgroundColor: softGrey,
       body: SafeArea(
         child: PageView(
           controller: page,
-          physics:
-              const NeverScrollableScrollPhysics(), // pindah hanya via tombol
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             // STEP 1
             Column(
@@ -152,7 +156,7 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                 _Header(
                   title: 'Form Pendaftaran Peserta Didik',
                   subtitle: 'Langkah 1 dari 2 : Data Diri',
-                  indicatorColor: blue,
+                  indicatorColor: accentBlue,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -166,26 +170,32 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                           TextFormField(
                             controller: nisC,
                             keyboardType: TextInputType.number,
-                            validator:
-                                (v) =>
-                                    (v == null || v.isEmpty)
-                                        ? 'Wajib diisi'
-                                        : null,
-                            decoration: const InputDecoration(
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? 'Wajib diisi' : null,
+                            decoration: InputDecoration(
                               hintText: 'Masukkan NISN',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
                           _label('Nama Lengkap'),
                           TextFormField(
                             controller: namaC,
-                            validator:
-                                (v) =>
-                                    (v == null || v.isEmpty)
-                                        ? 'Wajib diisi'
-                                        : null,
-                            decoration: const InputDecoration(
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? 'Wajib diisi' : null,
+                            decoration: InputDecoration(
                               hintText: 'Masukkan Nama Lengkap',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
@@ -193,8 +203,14 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                           TextFormField(
                             controller: telpC,
                             keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                              hintText: 'Contoh : 085892327275',
+                            decoration: InputDecoration(
+                              hintText: 'Contoh : 62 85892327275',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
@@ -203,8 +219,14 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                             controller: alamatC,
                             minLines: 2,
                             maxLines: 4,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'Masukkan Alamat',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
@@ -241,7 +263,7 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                             ],
                           ),
                           const SizedBox(height: 14),
-                          _label('email'),
+                          _label('Email'),
                           TextFormField(
                             controller: emailC,
                             keyboardType: TextInputType.emailAddress,
@@ -252,16 +274,28 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                               ).hasMatch(v);
                               return ok ? null : 'Email tidak valid';
                             },
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'Contoh : nama@email.com',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
                           _label('Asal Sekolah'),
                           TextFormField(
                             controller: asalSekolahC,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'Masukan Asal Sekolah',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
@@ -282,8 +316,15 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                               ),
                             ],
                             onChanged: (v) => setState(() => gender = v),
-                            validator:
-                                (v) => v == null ? 'Pilih salah satu' : null,
+                            validator: (v) => v == null ? 'Pilih salah satu' : null,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 22),
                           SizedBox(
@@ -291,21 +332,21 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                             height: 54,
                             child: FilledButton(
                               style: FilledButton.styleFrom(
-                                backgroundColor: blue,
+                                backgroundColor: accentBlue,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(28),
                                 ),
                               ),
                               onPressed: loading1 ? null : _submitStep1,
-                              child:
-                                  loading1
-                                      ? const CircularProgressIndicator()
-                                      : const Text(
-                                        'Continue',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                              child: loading1
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
+                                      'Continue',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
                                       ),
+                                    ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -323,7 +364,7 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                 _Header(
                   title: 'Form Pendaftaran Peserta Didik',
                   subtitle: 'Langkah 2 dari 2 : Data Orang Tua',
-                  indicatorColor: Colors.black54,
+                  indicatorColor: accentYellow,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -336,13 +377,16 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                           _label('Nama Ibu'),
                           TextFormField(
                             controller: ibuC,
-                            validator:
-                                (v) =>
-                                    (v == null || v.isEmpty)
-                                        ? 'Wajib diisi'
-                                        : null,
-                            decoration: const InputDecoration(
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? 'Wajib diisi' : null,
+                            decoration: InputDecoration(
                               hintText: 'Masukan Nama Ibu',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 14),
@@ -350,8 +394,14 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                           TextFormField(
                             controller: telpIbuC,
                             keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                              hintText: 'Contoh : 085892327275',
+                            decoration: InputDecoration(
+                              hintText: 'Contoh : 6285892327275',
+                              filled: true,
+                              fillColor: softBlue,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 40),
@@ -360,21 +410,21 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
                             height: 54,
                             child: FilledButton(
                               style: FilledButton.styleFrom(
-                                backgroundColor: blue,
+                                backgroundColor: accentYellow,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(28),
                                 ),
                               ),
                               onPressed: loading2 ? null : _submitStep2,
-                              child:
-                                  loading2
-                                      ? const CircularProgressIndicator()
-                                      : const Text(
-                                        'Submit',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                              child: loading2
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
+                                      'Submit',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: primaryNavy,
                                       ),
+                                    ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -393,12 +443,16 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
 
   // helpers UI
   Widget _label(String t) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
-    child: Text(
-      t,
-      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-    ),
-  );
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text(
+          t,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: primaryNavy,
+          ),
+        ),
+      );
 
   Widget _dropInt(
     String hint,
@@ -410,13 +464,20 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
     return DropdownButtonFormField<int>(
       value: val,
       hint: Text(hint),
-      items:
-          List.generate(
-            end - start + 1,
-            (i) => start + i,
-          ).map((v) => DropdownMenuItem(value: v, child: Text('$v'))).toList(),
+      items: List.generate(
+        end - start + 1,
+        (i) => start + i,
+      ).map((v) => DropdownMenuItem(value: v, child: Text('$v'))).toList(),
       onChanged: onChanged,
       validator: (v) => v == null ? 'Pilih' : null,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: softBlue,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
     );
   }
 
@@ -426,12 +487,19 @@ class _RegisterFlowPageState extends State<RegisterFlowPage> {
     return DropdownButtonFormField<int>(
       value: val,
       hint: Text(hint),
-      items:
-          years
-              .map((y) => DropdownMenuItem(value: y, child: Text('$y')))
-              .toList(),
+      items: years
+          .map((y) => DropdownMenuItem(value: y, child: Text('$y')))
+          .toList(),
       onChanged: onChanged,
       validator: (v) => v == null ? 'Pilih' : null,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: softBlue,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
     );
   }
 }
@@ -450,15 +518,13 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // back icon
         Align(
           alignment: Alignment.centerLeft,
           child: IconButton(
             onPressed: () => Navigator.maybePop(context),
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: primaryNavy),
           ),
         ),
-        // logo + title
         Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -469,10 +535,10 @@ class _Header extends StatelessWidget {
                 height: 84,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color(0xFFEAF1F9),
+                  color: softBlue,
                 ),
                 alignment: Alignment.center,
-                child: const Icon(Icons.school_rounded, size: 40),
+                child: const Icon(Icons.school_rounded, size: 40, color: accentBlue),
               ),
               const SizedBox(height: 12),
               Text(
@@ -480,6 +546,7 @@ class _Header extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
+                  color: primaryNavy,
                 ),
                 textAlign: TextAlign.center,
               ),

@@ -27,7 +27,7 @@ class _LoginpageState extends State<Loginpage> {
       return;
     }
 
-    final url = Uri.parse('http://10.18.118.179/psb-api/login.php'); // ganti sesuai alamat server kamu
+    final url = Uri.parse('http://192.168.0.213/psb-api/login.php');
     try {
       final response = await http.post(
         url,
@@ -46,7 +46,7 @@ class _LoginpageState extends State<Loginpage> {
           context,
           MaterialPageRoute(
             builder: (context) => DashboardSiswa(
-              nisn: data['data']['nisn'].toString(), // <-- Perbaikan di sini
+              nisn: data['data']['nisn'].toString(),
               nama: data['data']['nama'],
             ),
           ),
@@ -62,34 +62,42 @@ class _LoginpageState extends State<Loginpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // Header
             Container(
               width: double.infinity,
-              color: const Color(0xFF10345B),
-              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 27),
+              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+              decoration: const BoxDecoration(
+                color: Color(0xFF10345B),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+              ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.network(
-                    'https://sman2tangsel.sch.id/web/images/logo-mzr-1570786241.png',
-                    height: 120,
-                    width: 120,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.error, color: Colors.red);
-                    },
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQBwuddBfDYzFHfvCjSk2dHhn1KL_weVdxIA&s',
+                      height: 80,
+                      width: 80,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.error, color: Colors.red, size: 50),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   const Expanded(
                     child: Text(
-                      "Penerimaan Peserta Didik\nSMAN 2 Tangerang Selatan",
+                      "PSB SMAN Harvard Tangerang Selatan",
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'Poppins',
                       ),
                     ),
@@ -104,62 +112,52 @@ class _LoginpageState extends State<Loginpage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("NISN", style: TextStyle(fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 6),
-                  TextField(
-                    controller: nisnController,
-                    decoration: InputDecoration(
-                      hintText: "Masukkan NISN",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                  ),
+                  buildTextField("NISN", nisnController, "Masukkan NISN"),
                   const SizedBox(height: 20),
 
-                  const Text("Nama Lengkap", style: TextStyle(fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 6),
-                  TextField(
-                    controller: namaController,
-                    decoration: InputDecoration(
-                      hintText: "Masukkan Nama Lengkap",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                  ),
+                  buildTextField("Nama Lengkap", namaController, "Masukkan Nama Lengkap"),
                   const SizedBox(height: 20),
 
-                  const Text("Nama Ibu Kandung", style: TextStyle(fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 6),
-                  TextField(
-                    controller: ibuController,
-                    decoration: InputDecoration(
-                      hintText: "Masukkan Nama Ibu Kandung",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                  ),
+                  buildTextField("Nama Ibu Kandung", ibuController, "Masukkan Nama Ibu Kandung"),
                   const SizedBox(height: 30),
 
+                  // Tombol Login
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 55,
                     child: ElevatedButton(
                       onPressed: loginUser,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF10345B),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
                       ),
                       child: const Text(
                         "Login",
-                        style: TextStyle( color: Colors.white ,fontSize: 16, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
 
+                  // Error message
                   if (errorMessage.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Text(errorMessage, style: const TextStyle(color: Colors.red)),
+                    Container(
+                      margin: const EdgeInsets.only(top: 20),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.red, fontSize: 14),
+                      ),
                     ),
                 ],
               ),
@@ -167,6 +165,30 @@ class _LoginpageState extends State<Loginpage> {
           ],
         ),
       ),
+    );
+  }
+
+  // Fungsi builder untuk textfield biar rapi
+  Widget buildTextField(String label, TextEditingController controller, String hint) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.grey.shade100,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+        ),
+      ],
     );
   }
 }

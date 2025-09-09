@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:inventaris_app/loginpage.dart';
 import 'package:inventaris_app/mysql_utils.dart';
 
-import 'Dashboard.dart';
-
 void main() {
   MysqlUtils.initConnection();
   runApp(const MyApp());
